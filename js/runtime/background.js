@@ -35,7 +35,7 @@ export default class BackGround extends Sprite {
    */
   render(ctx) {
     ctx.drawImage(
-      this.img,
+      this.img, 
       0,
       0,
       this.width,

@@ -7,7 +7,10 @@ import DataBus from './databus'
 
 let ctx = canvas.getContext('2d')
 let databus = new DataBus()
-
+var ds;
+var View_IMG_SRC = new Image()
+var tertris1 = 'images/tetris1.png'
+View_IMG_SRC.src = tertris1
 /**
  * 游戏主函数
  */
@@ -15,9 +18,12 @@ export default class Main {
   constructor() {
     // 维护当前requestAnimationFrame的id
     this.aniId = 0
-
     this.restart()
   }
+  test(){
+    ctx.drawImage(View_IMG_SRC, 186, 893, 491, 978, 100 + 20, 100, 20 * 10, 20 * 20)
+  }
+  
 
   restart() {
     databus.reset()
@@ -114,7 +120,7 @@ export default class Main {
 
     databus.bullets
       .concat(databus.enemys)
-      .forEach((item) => {
+      .forEach((item) => { 
         item.drawToCanvas(ctx)
       })
 

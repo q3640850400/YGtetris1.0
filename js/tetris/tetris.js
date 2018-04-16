@@ -1,10 +1,11 @@
 "use strict";
 import GameView from './view.js'
-const contact = require('./contact.js')
+import _contact from './contact.js'
 //const app = getApp();// 获得小程序实例
-var gv = new GameView()
 var longtap = false
 var ctx = canvas.getContext('2d')
+var gv
+var contact=new(_contact)
 var player = {
   name: "null",
   score: 0,
@@ -29,12 +30,25 @@ var dia, pos, bak, run, sd, cot, che, tetris_20; //timecounter and something els
 
 export default class Main {
   constructor() {
+    //contact.link()
+    gv = new GameView(ctx)
+    console.log(gv)
+    this.ready_btnArea = { startX: 230, startY: 50, endX: 230 + 10 * 4, endY: 50 + 10 * 2 }
+    this.touchHandler = this.ready_touchEventHandler.bind(this)
+    canvas.addEventListener('touchstart', this.touchHandler)
     this.restart()
     //che = setInterval(this.check.bind(this), 1000)
   }
   readybtn() {
-    //contact.link()
+    contact.link()
+    this.touchHandler = this.left_touchEventHandler.bind(this)
+    canvas.addEventListener('touchstart', this.touchHandler)
+    this.touchHandler = this.right_touchEventHandler.bind(this)
+    canvas.addEventListener('touchstart', this.touchHandler)
+    this.touchHandler = this.turn_touchEventHandler.bind(this)
+    canvas.addEventListener('touchstart', this.touchHandler)
     this.restart()
+    che = setInterval(this.check.bind(this), 1000)
   }
   check() {
     var st = contact.caniget('state')
@@ -117,26 +131,53 @@ export default class Main {
   restart() {
     longtap = false
     this.start();
-    // run = setInterval(this.down.bind(this), 5000);
-    //sd = setInterval(this.straightdown.bind(this), 100);
+    run = setInterval(this.down.bind(this), 500);
+    sd = setInterval(this.straightdown.bind(this), 100);
     /*window.requestAnimationFrame(
       this.loop.bind(this),
       canvas
     )*/
   }
+  left_touchEventHandler(e) {e.preventDefault()
+    let x = e.touches[0].clientX;let y = e.touches[0].clientY;let area = this.gv.left_btnArea;
+    if (x >= area.startX && x <= area.endX && y >= area.startY && y <= area.endY){
+      this.left()
+    }
+  }
+  right_touchEventHandler(e) {
+    e.preventDefault()
+    let x = e.touches[0].clientX; let y = e.touches[0].clientY; let area = this.gv.right_btnArea;
+    if (x >= area.startX && x <= area.endX && y >= area.startY && y <= area.endY) {
+      this.right()
+    }
+  }
+  turn_touchEventHandler(e) {
+    e.preventDefault()
+    let x = e.touches[0].clientX; let y = e.touches[0].clientY; let area = this.gv.turn_btnArea;
+    if (x >= area.startX && x <= area.endX && y >= area.startY && y <= area.endY) {
+      this.turn()
+    }
+  }
+  ready_touchEventHandler(e) {
+    e.preventDefault()
+    let x = e.touches[0].clientX; let y = e.touches[0].clientY; let area = this.ready_btnArea;
+    if (x >= area.startX && x <= area.endX && y >= area.startY && y <= area.endY) {
+      this.readybtn()
+    }
+  }
+  
   /**
    * canvas重绘函数
    * 每一帧重新绘制所有的需要展示的元素
    */
   render() {
-    ctx.clearRect(0, 0, 200, 500)
-    // ctx.drawImage('../images/tetris.png',0,0,100,100)
-    //gv.test()
-    //gv.renderBackGround(ctx)
-    //gv.renderGameScore(ctx, player.score)
+     ctx.clearRect(0, 0, ctx.width, ctx.height)
+    gv.renderBackGround(ctx)
+    gv.renderGameScore(ctx, player.score)
     gv.renderTetris(ctx, cot, bak)
-    //gv.renderTetrispool(ctx, map, color)
-    //var Room=contact.caniget('Room')
+    gv.renderTetrispool(ctx, map, color)
+    gv.renderControlPanal(ctx)
+    var Room=contact.caniget('Room')
     // Room.forEach((player)=>{
     //   if(player.state==='update'){
     //     gv.renderOthers(ctx, player.map, color)
@@ -144,7 +185,5 @@ export default class Main {
     //   }
     // })
     // gv.renderOthers(ctx, map, color)
-    ctx.draw()
-
   }
 }
